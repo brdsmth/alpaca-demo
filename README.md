@@ -56,6 +56,14 @@ AAPL241220C00300000
 
 Where 00300000 equals $300.00. The first 5 digits (00300) represent the dollar amount, the last two digits representing the cents. The leading and trailing zeros are used for padding.
 
-```
+### Notes
 
-```
+- Python Virtual Environment
+
+`python3 -m venv venv`
+
+`source venv/bin/activate`
+
+`pip install -r requirements.txt`
+
+`deactivate`
