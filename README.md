@@ -26,6 +26,14 @@ This project uses the [Market Data API](https://docs.alpaca.markets/docs/about-m
 
 [Market Data API](https://docs.alpaca.markets/docs/about-market-data-api)
 
+## Trading API
+
+[Trading API](https://docs.alpaca.markets/docs/trading-api)
+
+Trading functionality currently located in `orders.py` and `positions.py`. To view portfolio run:
+
+`python3 src/positions.py`
+
 ### Historical API
 
 Historical data is taken from the Market Data API.
