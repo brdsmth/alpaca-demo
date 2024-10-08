@@ -20,7 +20,7 @@ python src/crypto.py
 
 # Alpaca
 
-This project uses the [Market Data API](https://docs.alpaca.markets/docs/about-market-data-api) provided by [Alpaca](https://alpaca.markets/)
+This project uses data provided by [Alpaca](https://alpaca.markets/)
 
 ## Market Data API
 
@@ -33,6 +33,12 @@ This project uses the [Market Data API](https://docs.alpaca.markets/docs/about-m
 Trading functionality currently located in `orders.py` and `positions.py`. To view portfolio run:
 
 `python3 src/positions.py`
+
+### Algorithmic Trading
+
+An example algorithmic trade implementation can be found in `algorithm.py`. To run this algorithm run:
+
+`python3 src/algorithm.py`
 
 ### Historical API
 
