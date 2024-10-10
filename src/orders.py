@@ -1,7 +1,7 @@
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
-from config import Config
+from config.config import Config
 
 # Using the Paper Trading API
 trading_client = TradingClient(
@@ -44,7 +44,7 @@ def sell_crypto(symbol, quantity):
 
 
 if __name__ == "__main__":
-    buy_crypto(
-        symbol="ETHUSD",
-        quantity="0.015",
+    buy_stock(
+        symbol="TSLA241011C00130000",
+        quantity="1",
     )

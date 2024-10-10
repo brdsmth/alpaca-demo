@@ -9,3 +9,4 @@ class Config:
 
     APCA_API_KEY_ID = os.getenv("APCA_API_KEY_ID")
     APCA_API_SECRET_KEY = os.getenv("APCA_API_SECRET_KEY")
+    DEBUG = os.getenv("DEBUG")
