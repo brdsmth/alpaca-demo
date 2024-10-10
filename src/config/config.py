@@ -1,5 +1,8 @@
 import os
 from dotenv import load_dotenv
+import sys
+
+sys.path.append(".")
 
 load_dotenv()
 
@@ -9,3 +12,4 @@ class Config:
 
     APCA_API_KEY_ID = os.getenv("APCA_API_KEY_ID")
     APCA_API_SECRET_KEY = os.getenv("APCA_API_SECRET_KEY")
+    DEBUG = os.getenv("DEBUG")

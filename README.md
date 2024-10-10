@@ -18,6 +18,14 @@ python src/options.py
 python src/crypto.py
 ```
 
+## Algorithms
+
+### Scan Options For Relative Volume Delta
+
+To run this algorithm we need to make sure that the `PYTHONPATH=` variable is set in the shell:
+
+`PYTHONPATH=src python3 src/scanners/options_volume.py`
+
 # Alpaca
 
 This project uses data provided by [Alpaca](https://alpaca.markets/)
