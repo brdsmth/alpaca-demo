@@ -159,6 +159,27 @@ def scan_for_valid_contracts(num_of_assets_to_scan, lookback_for_dataset_days):
     return combined_dataframe
 
 
+def filter_df_by_relative_volume(lookback_df, relative_volume_threshold):
+    """
+    Relative Volume Filter
+    - This function filters a dataframe by the threshold set for relative volume change
+
+    Args:
+        lookback_df (dataframe):                    A dataframe containing all available options contracts that have a recent trade and volume change
+        relative_volume_threshold (float):      Relative volume changes below this threshold will be dropped from results
+
+    Returns:
+        dataframe: A filtered dataframe with only assets that pass the relative volume threshold constraint
+    """
+    print("---> filter by relative volume")
+
+    filtered_df = lookback_df.loc[
+        lookback_df["relative_volume_change"] >= relative_volume_threshold
+    ]
+
+    return filtered_df
+
+
 def calculate_relative_volume(
     contracts_df: pd.DataFrame,
     start_date,
@@ -199,17 +220,6 @@ def calculate_relative_volume(
     ) / lookback_df["average_volume"]
 
     return lookback_df
-
-
-def filter_df_by_relative_volume(lookback_df, relative_volume_threshold):
-    print("---> filter by relative volume")
-
-    # Filter the DataFrame where relative_volume_change is greater than the threshold
-    filtered_df = lookback_df.loc[
-        lookback_df["relative_volume_change"] >= relative_volume_threshold
-    ]
-
-    return filtered_df
 
 
 def option_volume_scanner(
