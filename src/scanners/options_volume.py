@@ -294,7 +294,7 @@ if __name__ == "__main__":
     )
 
     send_email(
-        to_addr="brsmith110@gmail.com",
+        to_addr="brsmith110@gmail.com,jack.hynes4@gmail.com",
         from_addr="brsmith110@gmail.com",
         subject="Options Volume Scanner - Threshold: %s"
         % str(relative_volume_threshold * 100)
