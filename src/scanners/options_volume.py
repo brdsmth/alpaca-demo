@@ -1,10 +1,20 @@
 from datetime import datetime, timedelta
-from alpaca.data.historical import OptionHistoricalDataClient
+from alpaca.data.historical import (
+    OptionHistoricalDataClient,
+)
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import GetAssetsRequest
-from alpaca.trading.enums import AssetClass, AssetStatus, AssetExchange
-from alpaca.data.historical import StockHistoricalDataClient
-from alpaca.data.historical import OptionHistoricalDataClient
+from alpaca.trading.enums import (
+    AssetClass,
+    AssetStatus,
+    AssetExchange,
+)
+from alpaca.data.historical import (
+    StockHistoricalDataClient,
+)
+from alpaca.data.historical import (
+    OptionHistoricalDataClient,
+)
 from alpaca.data.requests import (
     OptionBarsRequest,
     OptionChainRequest,
@@ -14,7 +24,6 @@ from alpaca.data.timeframe import TimeFrame
 from config.config import Config
 from log.log import logfn
 from mail.send import send_email
-from tabulate import tabulate
 import pytz
 import pandas as pd
 
@@ -24,11 +33,13 @@ These functions should be separated out into different packages for easier reuse
 """
 
 alpacaOptions = OptionHistoricalDataClient(
-    api_key=Config.APCA_API_KEY_ID, secret_key=Config.APCA_API_SECRET_KEY
+    api_key=Config.APCA_API_KEY_ID,
+    secret_key=Config.APCA_API_SECRET_KEY,
 )
 
 alpacaTrading = TradingClient(
-    api_key=Config.APCA_API_KEY_ID, secret_key=Config.APCA_API_SECRET_KEY
+    api_key=Config.APCA_API_KEY_ID,
+    secret_key=Config.APCA_API_SECRET_KEY,
 )
 
 alpacaMarket = StockHistoricalDataClient(
@@ -112,7 +123,10 @@ def scan_for_valid_contracts(num_of_assets_to_scan, lookback_for_dataset_days):
             if option_bars_df.size == 0:
                 logfn(
                     "---> no option bars for %s in last %d days"
-                    % (strike_price, lookback_for_dataset_days)
+                    % (
+                        strike_price,
+                        lookback_for_dataset_days,
+                    )
                 )
                 continue
 
@@ -137,14 +151,34 @@ def scan_for_valid_contracts(num_of_assets_to_scan, lookback_for_dataset_days):
         "volume"
     ].transform("mean")
 
-    logfn("---> combined dataframes \n", combined_dataframe)
+    logfn(
+        "---> combined dataframes \n",
+        combined_dataframe,
+    )
 
     return combined_dataframe
 
 
 def calculate_relative_volume(
-    contracts_df: pd.DataFrame, start_date, end_date, lookback_for_volume_change_hours
+    contracts_df: pd.DataFrame,
+    start_date,
+    end_date,
+    lookback_for_volume_change_hours,
 ):
+    """
+    Relative Volume Calculator
+    - This function calculates the volume change relative to the average volume for the lookback interval and saves it to the dataframe
+
+    Args:
+        contracts_df (dataframe):                   A dataframe containing all available options contracts
+        lookback_for_volume_change_hours (int):     The number of hours used to calculate the relative volume
+        end_date (date):                            The end of the interval used to calculate relative volume
+        start_date (date):                          The beginning of the interval used to calculate relative volume
+
+    Returns:
+        dataframe: A filtered dataframe with an additional column with current volume relative to the average volume
+    """
+
     print("---> calculate relative volume")
     print("---> lookback start", start_date)
     print("---> lookback end", end_date)
@@ -187,12 +221,29 @@ def option_volume_scanner(
     end_date,
     start_date,
 ):
+    """
+    Options Volume Scanner
+    - This function scans all available options contracts on the NASDAQ and compares their
+        relative volume change in a "lookback" window to their average volume change over a secondary (longer) lookback window
 
-    # Testing is sometimes easier by reading from csv
-    # We use this flag to bypass the scan and read from a prescanned csv
+    Args:
+        reading_from_csv (bool):                If true, function will bypass making calls to Alpaca and instead read from local csv
+        num_of_assets_to_scan (int):            Used to limit the quantity asset data retreived from Alpaca
+        relative_volume_threshold (float):      Relative volume changes below this threshold will be dropped from results
+        lookback_for_dataset_days (int):        The number of days used to calculate the average volume
+        lookback_for_volume_change_hours (int): The number of hours used to calculate the relative volume
+        end_date (date):                        The end of the interval used to calculate relative volume
+        start_date (date):                      The beginning of the interval used to calculate relative volume
+
+    Returns:
+        dataframe: A filtered dataframe containing asset data that meets the relative volume threshold
+    """
+
+    # We use this flag when testing to bypass a new scan and instead read from a prescanned csv
     if reading_from_csv != True:
         valid_contracts = scan_for_valid_contracts(
-            num_of_assets_to_scan, lookback_for_dataset_days
+            num_of_assets_to_scan,
+            lookback_for_dataset_days,
         )
         valid_contracts.to_csv("dev/data/valid_contracts.csv")
     else:
@@ -236,7 +287,12 @@ def parse_symbol(symbol):
     exp_day = symbol[8:10]
     call_or_put = symbol[10]
     strike_price = symbol[11:]
-    return asset, f"20{exp_year}-{exp_month}-{exp_day}", call_or_put, strike_price
+    return (
+        asset,
+        f"20{exp_year}-{exp_month}-{exp_day}",
+        call_or_put,
+        strike_price,
+    )
 
 
 if __name__ == "__main__":
@@ -264,9 +320,14 @@ if __name__ == "__main__":
     )
 
     # Apply the parsing to the symbol column and create new columns
-    filtered_options[["Asset", "Expiration Date", "Call/Put", "Strike Price"]] = (
-        filtered_options["symbol"].apply(lambda sym: pd.Series(parse_symbol(sym)))
-    )
+    filtered_options[
+        [
+            "Asset",
+            "Expiration Date",
+            "Call/Put",
+            "Strike Price",
+        ]
+    ] = filtered_options["symbol"].apply(lambda sym: pd.Series(parse_symbol(sym)))
 
     filtered_options.drop(columns=["symbol"], inplace=True)
 
@@ -290,7 +351,10 @@ if __name__ == "__main__":
     ]
 
     filtered_options_html = filtered_options.to_html(
-        index=False, border=0, justify="center", classes="table table-striped"
+        index=False,
+        border=0,
+        justify="center",
+        classes="table table-striped",
     )
 
     send_email(
