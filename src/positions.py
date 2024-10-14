@@ -68,4 +68,4 @@ def get_position(symbol):
 
 if __name__ == "__main__":
     get_portfolio()
-    get_position("TSLA241011C00130000")
+    # get_position("TSLA241011C00130000")

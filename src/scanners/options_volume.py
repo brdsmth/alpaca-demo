@@ -13,6 +13,8 @@ from alpaca.data.requests import (
 from alpaca.data.timeframe import TimeFrame
 from config.config import Config
 from log.log import logfn
+from mail.send import send_email
+from tabulate import tabulate
 import pytz
 import pandas as pd
 
@@ -220,18 +222,30 @@ def option_volume_scanner(
                 )
             else:
                 print("---> filtered df\n", filtered_df)
+                return filtered_df
 
     else:
         print("---> no valid contracts to calculate volume change")
 
 
+# Assuming filtered_options is the DataFrame
+def parse_symbol(symbol):
+    asset = symbol[:4]
+    exp_year = symbol[4:6]
+    exp_month = symbol[6:8]
+    exp_day = symbol[8:10]
+    call_or_put = symbol[10]
+    strike_price = symbol[11:]
+    return asset, f"20{exp_year}-{exp_month}-{exp_day}", call_or_put, strike_price
+
+
 if __name__ == "__main__":
 
-    reading_from_csv = False
+    reading_from_csv = True
     num_of_assets_to_scan = 5
     relative_volume_threshold = (
         # 2  # e.g. 200% increase in volume compared to average
-        0.5  # e.g. 50% increase in volume compare to average
+        5  # e.g. 50% increase in volume compare to average
     )
 
     lookback_for_dataset_days = 7
@@ -239,7 +253,7 @@ if __name__ == "__main__":
     end_date = datetime.now(pytz.UTC)
     start_date = end_date - timedelta(hours=lookback_for_volume_change_hours)
 
-    option_volume_scanner(
+    filtered_options = option_volume_scanner(
         reading_from_csv=reading_from_csv,
         num_of_assets_to_scan=num_of_assets_to_scan,
         relative_volume_threshold=relative_volume_threshold,
@@ -247,4 +261,43 @@ if __name__ == "__main__":
         lookback_for_volume_change_hours=lookback_for_volume_change_hours,
         end_date=end_date,
         start_date=start_date,
+    )
+
+    # Apply the parsing to the symbol column and create new columns
+    filtered_options[["Asset", "Expiration Date", "Call/Put", "Strike Price"]] = (
+        filtered_options["symbol"].apply(lambda sym: pd.Series(parse_symbol(sym)))
+    )
+
+    filtered_options.drop(columns=["symbol"], inplace=True)
+
+    filtered_options = filtered_options[
+        [
+            "Asset",
+            "Expiration Date",
+            "Call/Put",
+            "Strike Price",
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "trade_count",
+            "vwap",
+            "average_volume",
+            "relative_volume_change",
+        ]
+    ]
+
+    filtered_options_html = filtered_options.to_html(
+        index=False, border=0, justify="center", classes="table table-striped"
+    )
+
+    send_email(
+        to_addr="brsmith110@gmail.com",
+        from_addr="brsmith110@gmail.com",
+        subject="Options Volume Scanner - Threshold: %s"
+        % str(relative_volume_threshold * 100)
+        + "%",
+        content=filtered_options_html,
     )

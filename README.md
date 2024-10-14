@@ -24,7 +24,7 @@ python src/crypto.py
 
 To run this algorithm we need to make sure that the `PYTHONPATH=` variable is set in the shell:
 
-`PYTHONPATH=src python3 src/scanners/options_volume.py`
+`PYTHONPATH=src DEBUG=true python3 src/scanners/options_volume.py`
 
 # Alpaca
 
